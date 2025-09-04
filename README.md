@@ -1,22 +1,20 @@
-# Welcome to your Lovable project
+# Learn Flow Coder
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/b8ab73b9-49d1-4b51-bbcc-16b1b3226fb8
+This repository contains the source code for the Learn Flow Coder project.
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
+**Local development**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b8ab73b9-49d1-4b51-bbcc-16b1b3226fb8) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+Clone the repo and work locally using your preferred IDE.
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -62,12 +60,8 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/b8ab73b9-49d1-4b51-bbcc-16b1b3226fb8) and click on Share -> Publish.
+You can deploy to any static hosting provider (e.g., Netlify, Vercel, GitHub Pages) after running `npm run build`.
 
-## Can I connect a custom domain to my Lovable project?
+## Custom domains
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Set up custom domains via your hosting provider's DNS and project settings.

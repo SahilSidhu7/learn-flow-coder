@@ -1,42 +1,142 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, BookOpen, HelpCircle, CheckCircle, Code, Play } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  HelpCircle,
+  CheckCircle,
+  Code,
+  Play,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import Markdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+// import Editor from 'react-simple-code-editor';
+// import { highlight, languages } from 'prismjs/components/prism-core';
+// import 'prismjs/components/prism-clike';
+// import 'prismjs/components/prism-javascript';
+// import 'prismjs/themes/prism.css';
+import Editor from "@monaco-editor/react";
+
+function CodeBlock({ node, inline, className, children, ...props }) {
+  const match = /language-(\w+)/.exec(className || "");
+  const codeString = String(children).replace(/\n$/, "");
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(codeString);
+  }
+
+  return !inline && match ? (
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={copyToClipboard}
+        style={{
+          position: "absolute",
+          right: 10,
+          top: 10,
+          zIndex: 2,
+          padding: "4px 12px",
+          fontSize: "13px",
+          color: "white",
+          border: "2px solid white",
+          borderRadius: "5px",
+        }}
+      >
+        Copy
+      </button>
+      <SyntaxHighlighter
+        style={atomDark}
+        language={match[9]}
+        {...props}
+        PreTag="div"
+      >
+        {codeString}
+      </SyntaxHighlighter>
+    </div>
+  ) : (
+    <code className={className} {...props}>
+      {children}
+    </code>
+  );
+}
 
 const Learning = () => {
   const { topicId } = useParams();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
-  const [userCode, setUserCode] = useState("");
+  const [userCode, setUserCode] = useState('print("Hello, World!")');
+  const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState("python");
+  const [output, setOutput] = useState("Click run to see output");
 
   const { data: topic } = useQuery({
     queryKey: ["topic", topicId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("topics")
-        .select(`
+        .select(
+          `
           *,
           language:languages(name)
-        `)
+        `
+        )
         .eq("id", parseInt(topicId || "0"))
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     enabled: !!topicId,
   });
 
-  const { data: questions, isLoading, error } = useQuery({
+  // Fetch all topics for this language to determine previous/next topic navigation
+  const { data: siblingTopics } = useQuery({
+    queryKey: ["topics-for-language", topic?.language_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("topics")
+        .select("id,name,language_id")
+        .eq("language_id", topic?.language_id as number)
+        .order("id");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!topic?.language_id,
+  });
+
+  const currentTopicIndex =
+    siblingTopics?.findIndex((t) => t.id === topic?.id) ?? -1;
+  const previousTopic =
+    currentTopicIndex > 0 ? siblingTopics?.[currentTopicIndex - 1] : undefined;
+  const nextTopic =
+    siblingTopics &&
+    currentTopicIndex >= 0 &&
+    currentTopicIndex < siblingTopics.length - 1
+      ? siblingTopics[currentTopicIndex + 1]
+      : undefined;
+
+  const {
+    data: questions,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["questions", topicId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -44,7 +144,7 @@ const Learning = () => {
         .select("*")
         .eq("topic_id", parseInt(topicId || "0"))
         .order("id");
-      
+
       if (error) throw error;
       return data;
     },
@@ -53,15 +153,74 @@ const Learning = () => {
 
   const currentQuestion = questions?.[currentQuestionIndex];
 
-  const handleRunCode = () => {
-    if (!userCode.trim()) {
-      toast.error("Please write some code first!");
-      return;
-    }
-    
-    // Simulate running code - in a real app, this would connect to an actual compiler API
-    toast.success("Code executed successfully! (This is a demo - integrate with a real compiler API)");
-  };
+  // const handleRunCode = () => {
+  //   if (!userCode.trim()) {
+  //     toast.error("Please write some code first!");
+  //     return;
+  //   }
+
+  //   // Simulate running code - in a real app, this would connect to an actual compiler API
+  //   toast.success("Code executed successfully! (This is a demo - integrate with a real compiler API)");
+  // };
+
+  async function handleRunCode() {
+    setLoading(true);
+    const response = await fetch(
+      "http://comp.webappster.store/submissions?base64_encoded=false&wait=false",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          source_code: userCode,
+          language_id: 71,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    const token = data.token;
+
+    // Poll for result
+    const getResult = async () => {
+      const res = await fetch(
+        `http://comp.webappster.store/submissions/${token}?base64_encoded=false`
+      );
+      const result = await res.json();
+
+      if (result.status.id <= 2) {
+        // Status 1 or 2 means still processing, poll again
+        setTimeout(getResult, 1000);
+      } else {
+        // Execution is complete
+        setOutput(
+          result.stdout || result.compile_output || result.stderr || "No output"
+        );
+        setLoading(false);
+      }
+    };
+
+    getResult();
+    // const payload = {
+    //   language,
+    //   stdin,
+    //   files: [{
+    //     name: language === 'python' ? 'main.py' : 'Main.' + language,
+    //     content: userCode,
+    //   }]
+    // };
+    // try {
+    //   const res = await axios.post(
+    //     'https://onecompiler.com/api/v1/run?access_token=YOUR_API_KEY',
+    //     payload
+    //   );
+    //   setOutput(res.data.stdout || res.data.stderr || res.data.exception);
+    // } catch (err) {
+    //   setOutput('Error executing code');
+    // }
+    // setLoading(false);
+  }
 
   const handleNextQuestion = () => {
     if (questions && currentQuestionIndex < questions.length - 1) {
@@ -120,7 +279,9 @@ const Learning = () => {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h2 className="text-2xl font-bold text-destructive mb-4">Error Loading Content</h2>
+        <h2 className="text-2xl font-bold text-destructive mb-4">
+          Error Loading Content
+        </h2>
         <p className="text-muted-foreground mb-4">
           Unable to fetch learning content. Please try again later.
         </p>
@@ -173,7 +334,13 @@ const Learning = () => {
               {topic?.documentation ? (
                 <div className="prose prose-neutral max-w-none">
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {topic.documentation}
+                    <Markdown
+                      components={{
+                        code: CodeBlock,
+                      }}
+                    >
+                      {topic.documentation}
+                    </Markdown>
                   </p>
                 </div>
               ) : (
@@ -195,16 +362,15 @@ const Learning = () => {
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-2">
                         <HelpCircle className="h-5 w-5" />
-                        Question {currentQuestionIndex + 1} of {questions.length}
+                        Question {currentQuestionIndex + 1} of{" "}
+                        {questions.length}
                       </CardTitle>
-                      <Badge variant="outline">
-                        {currentQuestion?.id}
-                      </Badge>
+                      <Badge variant="outline">{currentQuestion?.id}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm leading-relaxed">
-                      {currentQuestion?.question}
+                      <Markdown>{currentQuestion?.question}</Markdown>
                     </p>
 
                     <div className="flex gap-2">
@@ -232,7 +398,8 @@ const Learning = () => {
                       <Card className="bg-blue-50 border-blue-200">
                         <CardContent className="pt-4">
                           <p className="text-sm text-blue-800">
-                            <strong>Hint:</strong> {currentQuestion.hint}
+                            <strong>Hint:</strong>
+                            <Markdown>{currentQuestion.hint}</Markdown>
                           </p>
                         </CardContent>
                       </Card>
@@ -242,7 +409,10 @@ const Learning = () => {
                       <Card className="bg-green-50 border-green-200">
                         <CardContent className="pt-4">
                           <p className="text-sm text-green-800">
-                            <strong>Solution:</strong> {currentQuestion.solution}
+                            <strong>Solution:</strong>
+                            <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+                              <Markdown>{currentQuestion.solution}</Markdown>
+                            </div>
                           </p>
                         </CardContent>
                       </Card>
@@ -258,7 +428,10 @@ const Learning = () => {
                       </Button>
                       <Button
                         onClick={handleNextQuestion}
-                        disabled={!questions || currentQuestionIndex >= questions.length - 1}
+                        disabled={
+                          !questions ||
+                          currentQuestionIndex >= questions.length - 1
+                        }
                       >
                         Next Question
                       </Button>
@@ -269,6 +442,14 @@ const Learning = () => {
 
               {/* Compiler Section */}
               <div className="space-y-6">
+                <iframe
+                  frameBorder="0"
+                  height="450px"
+                  src={`https://onecompiler.com/embed/${
+                    topic?.language?.name.toLowerCase().split(" ")[0]
+                  }?hideNew=true&hideNewFileOption=true&hideTitle=true`}
+                  width="100%"
+                ></iframe>
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -280,13 +461,35 @@ const Learning = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <Textarea
+                    {/* <Textarea
                       placeholder="Write your code here..."
                       value={userCode}
                       onChange={(e) => setUserCode(e.target.value)}
                       className="font-mono text-sm min-h-[300px] resize-none"
-                    />
-                    <Button onClick={handleRunCode} className="w-full">
+                    /> */}
+                    {/* <Editor
+      value={userCode}
+      onValueChange={userCode => setUserCode(userCode)}
+      highlight={userCode => highlight(userCode, languages.js)}
+      padding={10}
+      style={{
+        fontFamily: '"Fira code", "Fira Mono", monospace',
+        fontSize: 18,
+      }}
+    /> */}
+                    {/* <Editor
+      height="40vh"
+      defaultLanguage="javascript"
+      value={userCode}
+      theme="vs-dark"                // Change to "vs-light" for a light theme
+      onChange={setUserCode}
+      options={{
+        selectOnLineNumbers: true,
+        fontSize: 14,
+        minimap: { enabled: true },
+      }}
+    /> */}
+                    {/* <Button onClick={handleRunCode} className="w-full">
                       <Play className="mr-2 h-4 w-4" />
                       Run Code
                     </Button>
@@ -296,13 +499,9 @@ const Learning = () => {
                         <CardTitle className="text-sm">Output</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-muted-foreground font-mono">
-                          Click "Run Code" to see the output here...
-                          <br />
-                          <em>(Note: This is a demo. Integrate with a real compiler API like Judge0, CodeAPI, or similar services)</em>
-                        </p>
+                        {output}
                       </CardContent>
-                    </Card>
+                    </Card> */}
                   </CardContent>
                 </Card>
               </div>
@@ -311,7 +510,9 @@ const Learning = () => {
             <Card>
               <CardContent className="text-center py-12">
                 <HelpCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No Questions Available</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  No Questions Available
+                </h3>
                 <p className="text-muted-foreground">
                   There are no practice questions for this topic yet.
                 </p>
@@ -320,6 +521,19 @@ const Learning = () => {
           )}
         </TabsContent>
       </Tabs>
+      {/* Floating Next/Previous Topic Controls */}
+      <div className="fixed bottom-4 right-4 flex gap-2">
+        <Link to={previousTopic ? `/learn/${previousTopic.id}` : `#`}>
+          <Button variant="outline" disabled={!previousTopic}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Previous Topic
+          </Button>
+        </Link>
+        <Link to={nextTopic ? `/learn/${nextTopic.id}` : `#`}>
+          <Button disabled={!nextTopic}>
+            Next Topic <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
