@@ -7,6 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
+    
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
@@ -14,6 +15,29 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+      Row: {
+        id: string; // uuid
+        credits: number;
+      };
+      Insert: {
+        id: string;
+        credits?: number;
+      };
+      Update: {
+        id?: string;
+        credits?: number;
+      };
+      Relationships: [
+        {
+          foreignKeyName: "profiles_id_fkey",
+          columns: ["id"],
+          isOneToOne: true,
+          referencedRelation: "users",
+          referencedColumns: ["id"],
+        }
+      ];
+    };
       languages: {
         Row: {
           id: number
@@ -29,6 +53,151 @@ export type Database = {
         }
         Relationships: []
       }
+      usercources: {
+        Row: {
+          id: number;
+          user_id: string;
+          course: string | null;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          course?: string | null;
+        };
+        Update: {
+          id?: number;
+          user_id?: string;
+          course?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "usercources_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"],
+          },
+        ];
+      }
+      course_topics: {
+          Row: {
+            id: number;
+            user_id: string;
+            course_id: number;
+            topic_name: string;
+            language: string;
+          };
+          Insert: {
+            id?: number;
+            user_id: string;
+            course_id: number;
+            topic_name: string;
+          };
+          Update: {
+            id?: number;
+            user_id?: string;
+            course_id?: number;
+            topic_name?: string;
+          };
+          Relationships: [
+            {
+              foreignKeyName: "course_topics_user_id_fkey",
+              columns: ["user_id"],
+              isOneToOne: false,
+              referencedRelation: "users",
+              referencedColumns: ["id"],
+            },
+            {
+              foreignKeyName: "course_topics_course_id_fkey",
+              columns: ["course_id"],
+              isOneToOne: false,
+              referencedRelation: "usercources",
+              referencedColumns: ["id"],
+            },
+          ];
+      }
+      topic_subtopics: {
+        Row: {
+          id: number;
+          user_id: string;
+          topic_id: number;
+          subtopic_name: string;
+          documentation: string | null;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          topic_id: number;
+          subtopic_name: string;
+          documentation?: string | null;
+        };
+        Update: {
+          id?: number;
+          user_id?: string;
+          topic_id?: number;
+          subtopic_name?: string;
+          documentation?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "topic_subtopics_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"],
+          },
+          {
+            foreignKeyName: "topic_subtopics_topic_id_fkey",
+            columns: ["topic_id"],
+            isOneToOne: false,
+            referencedRelation: "course_topics",
+            referencedColumns: ["id"],
+          },
+        ];
+      }
+      subtopic_questions: {
+        Row: {
+          id: number;
+          user_id: string;
+          subtopic_id: number;
+          question_text: string;
+          hint: string | null;
+          solution: string | null;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          subtopic_id: number;
+          question_text: string;
+          hint?: string | null;
+          solution?: string | null;
+        };
+        Update: {
+          id?: number;
+          user_id?: string;
+          subtopic_id?: number;
+          question_text?: string;
+          hint?: string | null;
+          solution?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subtopic_questions_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"],
+          },
+          {
+            foreignKeyName: "subtopic_questions_subtopic_id_fkey",
+            columns: ["subtopic_id"],
+            isOneToOne: false,
+            referencedRelation: "topic_subtopics",
+            referencedColumns: ["id"],
+          },
+        ];
+      }
+
       questions: {
         Row: {
           hint: string | null
@@ -90,6 +259,7 @@ export type Database = {
           },
         ]
       }
+      
     }
     Views: {
       [_ in never]: never

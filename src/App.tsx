@@ -8,6 +8,10 @@ import Languages from "./pages/Languages";
 import Topics from "./pages/Topics";
 import Learning from "./pages/Learning";
 import NotFound from "./pages/NotFound";
+import PersonalCourses from "./pages/PersonalCourses";
+import Perstopics from "./pages/Perstopics";
+import Subtopics from "./pages/Subtopics";
+import PersLearning from "./pages/PersLearning";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +26,10 @@ const App = () => (
           <Route path="/languages" element={<Languages />} />
           <Route path="/topics/:languageId" element={<Topics />} />
           <Route path="/learn/:topicId" element={<Learning />} />
+          <Route path="/personal-courses" element={<PersonalCourses />} />
+          <Route path="/perstopics/:courseId" element={<Perstopics />} />
+          <Route path="/subtopics/:topicId" element={<Subtopics />} />
+          <Route path="/perslearn/:subtopicId" element={<PersLearning />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

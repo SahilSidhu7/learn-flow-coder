@@ -13,60 +13,60 @@ import { ArrowLeft, BookOpen, HelpCircle } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const Topics = () => {
-  const { languageId } = useParams();
+const Subtopics = () => {
+  const { topicId } = useParams();
 
-  const { data: language } = useQuery({
-    queryKey: ["language", languageId],
+  const { data: course_topic } = useQuery({
+    queryKey: ["course_topic", topicId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("languages")
+        .from("course_topics")
         .select("*")
-        .eq("id", parseInt(languageId || "0"))
+        .eq("id", parseInt(topicId || "0"))
         .single();
 
       if (error) throw error;
       return data;
     },
-    enabled: !!languageId,
+    enabled: !!topicId,
   });
 
   const {
-    data: topics,
+    data: topic_subtopics,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["topics", languageId],
+    queryKey: ["topic_subtopics", topicId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("topics")
+        .from("topic_subtopics")
         .select("*")
-        .eq("language_id", parseInt(languageId || "0"))
+        .eq("topic_id", parseInt(topicId || "0"))
         .order("id");
 
       if (error) throw error;
       return data;
     },
-    enabled: !!languageId,
+    enabled: !!topicId,
   });
 
   const { data: questionCounts } = useQuery({
-    queryKey: ["question-counts", languageId],
+    queryKey: ["question-counts", topicId],
     queryFn: async () => {
       // First get all topic IDs for this language
       const { data: topicIds } = await supabase
-        .from("topics")
+        .from("topic_subtopics")
         .select("id")
-        .eq("language_id", parseInt(languageId || "0"));
+        .eq("topic_id", parseInt(topicId || "0"));
 
       if (!topicIds?.length) return {};
 
       // Then get all questions for these topics
       const { data: questions, error } = await supabase
-        .from("questions")
-        .select("topic_id")
+        .from("subtopic_questions")
+        .select("subtopic_id")
         .in(
-          "topic_id",
+          "subtopic_id",
           topicIds.map((t) => t.id)
         );
 
@@ -75,11 +75,11 @@ const Topics = () => {
       // Count questions by topic_id
       const counts: Record<number, number> = {};
       questions?.forEach((q) => {
-        counts[q.topic_id] = (counts[q.topic_id] || 0) + 1;
+        counts[q.subtopic_id] = (counts[q.subtopic_id] || 0) + 1;
       });
       return counts;
     },
-    enabled: !!languageId,
+    enabled: !!topicId,
   });
 
   if (isLoading) {
@@ -115,7 +115,7 @@ const Topics = () => {
         <p className="text-muted-foreground mb-4">
           Unable to fetch topics for this language. Please try again later.
         </p>
-        <Link to="/languages">
+        <Link to={`/perstopics/${course_topic.id}`}>
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Languages
@@ -128,22 +128,24 @@ const Topics = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center gap-4 mb-8">
-        <Link to="/languages">
+        <Link to={`/perstopics/${course_topic.course_id}`}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold">{language?.name} Topics</h1>
+          <h1 className="text-3xl font-bold">
+            {course_topic?.topic_name} Topics
+          </h1>
           <p className="text-muted-foreground">
-            Learn {language?.name} step by step through these topics
+            Learn {course_topic?.topic_name} step by step through these topics
           </p>
         </div>
       </div>
 
-      {topics && topics.length > 0 ? (
+      {topic_subtopics && topic_subtopics.length > 0 ? (
         <div className="space-y-4">
-          {topics.map((topic, index) => (
+          {topic_subtopics.map((topic, index) => (
             <Card key={topic.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -154,7 +156,7 @@ const Topics = () => {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <BookOpen className="h-5 w-5" />
-                        {topic.name}
+                        {topic.subtopic_name}
                       </CardTitle>
                       {topic.documentation && (
                         <CardDescription className="mt-2 line-clamp-2">
@@ -170,7 +172,7 @@ const Topics = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <Link to={`/learn/${topic.id}`}>
+                <Link to={`/perslearn/${topic.id}`}>
                   <Button className="w-full">Start Topic</Button>
                 </Link>
               </CardContent>
@@ -180,14 +182,14 @@ const Topics = () => {
       ) : (
         <div className="text-center py-12">
           <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h2 className="text-2xl font-bold mb-2">No Topics Available</h2>
+          <h2 className="text-2xl font-bold mb-2">No Sub Topics Available</h2>
           <p className="text-muted-foreground mb-4">
-            There are no topics available for this language yet.
+            There are no sub topics available for this topic yet.
           </p>
-          <Link to="/languages">
+          <Link to={`/perstopics/${course_topic.course_id}`}>
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Languages
+              Back to Topics
             </Button>
           </Link>
         </div>
@@ -196,4 +198,4 @@ const Topics = () => {
   );
 };
 
-export default Topics;
+export default Subtopics;
