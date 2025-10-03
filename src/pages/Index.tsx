@@ -89,18 +89,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 pt-8 text-center">
-        <Link to="/personal-courses">
-          <Button
-            size="lg"
-            variant="secondary"
-            disabled={!user}
-            style={{ marginBottom: 16 }}
-          >
-            Access Personal Courses
-          </Button>
-        </Link>
-      </div>
       {/* Auth Button and Modal */}
       <div style={{ position: "fixed", top: 20, right: 20, zIndex: 100 }}>
         {user ? (
@@ -221,6 +209,18 @@ const Index = () => {
             </Button>
           </Link>
         </div>
+        <div className="container mx-auto px-4 pt-8 text-center">
+          <Link to="/personal-courses">
+            <Button
+              size="lg"
+              variant="secondary"
+              disabled={!user}
+              style={{ marginBottom: 16 }}
+            >
+              Access Personal Courses
+            </Button>
+          </Link>
+        </div>
       </section>
 
       {/* Features Section */}
@@ -284,6 +284,19 @@ const Index = () => {
           </Link>
         </div>
       </section>
+      {/* Footer navigation for About Me and Pricing */}
+      <div className="w-full flex justify-center gap-8 py-8 bg-background border-t mt-8">
+        <Link to="/about-me">
+          <Button variant="outline" size="lg">
+            About Me
+          </Button>
+        </Link>
+        {/* <Link to="/pricing">
+          <Button variant="outline" size="lg">
+            Pricing
+          </Button>
+        </Link> */}
+      </div>
     </div>
   );
 };
