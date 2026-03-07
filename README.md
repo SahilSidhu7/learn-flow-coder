@@ -1,67 +1,112 @@
 # Learn Flow Coder
 
-## Project info
+A personal development repository focused on improving programming skills through structured coding practice and project-based learning.
 
-This repository contains the source code for the Learn Flow Coder project.
+This project is designed as a learning environment where different programming concepts, algorithms, and development workflows are explored through hands-on coding.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Purpose
 
-**Local development**
+The goal of this repository is to build a structured learning flow for becoming a stronger developer by:
 
-Clone the repo and work locally using your preferred IDE.
+- Practicing programming concepts
+- Implementing algorithms and problem-solving techniques
+- Experimenting with development workflows
+- Building small coding experiments and utilities
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes.
+## Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Hands-on coding practice
+- Algorithm and problem-solving exercises
+- Experimentation with programming concepts
+- Clean and structured learning workflow
+- Continuous improvement through coding
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+## Technologies Used
+
+Depending on the modules or experiments inside the repository:
+
+- Python
+- C++
+- JavaScript
+- Git & GitHub
+
+---
+
+## Learning Focus
+
+This repository focuses on improving skills in:
+
+- Data structures
+- Algorithms
+- Logical problem solving
+- Code organization
+- Developer workflow
+- Writing clean and maintainable code
+
+---
+
+## Project Structure
+learn-flow-coder/
+
+├── algorithms/
+├── practice-problems/
+├── experiments/
+├── notes/
+└── README.md
+
+
+Each directory contains code and experiments related to specific learning topics.
+
+---
+
+## How to Use
+
+Clone the repository:
+
+```bash
 git clone https://github.com/SahilSidhu7/learn-flow-coder.git
-
-# Step 2: Navigate to the project directory.
-cd learn-flow-coder
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Navigate to the project:
+```bash
+cd learn-flow-coder
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Explore the directories and run the scripts or examples depending on the programming language used.
 
-**Use GitHub Codespaces**
+## Goals
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Improve coding fluency
 
-## What technologies are used for this project?
+- Strengthen algorithmic thinking
 
-This project is built with:
+- Build consistent coding habits
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Document learning progress
 
-## How can I deploy this project?
+## Future Improvements
 
-You can deploy to any static hosting provider (e.g., Netlify, Vercel, GitHub Pages) after running `npm run build`.
+- Add more structured coding challenges
 
-## Custom domains
+- Implement data structure visualizations
 
-Set up custom domains via your hosting provider's DNS and project settings.
+- Add documentation for each learning module
+
+- Track progress through coding milestones
+
+## Author
+
+Sahilpreet Singh Sidhu
+
+GitHub:
+https://github.com/SahilSidhu7
+
+License
+
+This project is open-source and available for learning and educational purposes.
