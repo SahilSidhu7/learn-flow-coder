@@ -54,14 +54,38 @@ This repository focuses on improving skills in:
 ## Project Structure
 learn-flow-coder/
 
-├── algorithms/
-├── practice-problems/
-├── experiments/
-├── notes/
-└── README.md
+├── algorithms/<br>
+├── practice-problems/<br>
+├── experiments/<br>
+├── notes/<br>
+└── README.md<br>
 
 
 Each directory contains code and experiments related to specific learning topics.
+
+---
+
+## Screenshots
+
+- Main page
+  
+![](screenshots/mainpage.png)
+
+- Courses
+  
+![](screenshots/courses.png)
+
+- Topics
+  
+![](screenshots/topics.png)
+
+- Documentation
+  
+![](screenshots/docs.png)
+
+- Questions
+  
+![](screenshots/questions.png)
 
 ---
 
