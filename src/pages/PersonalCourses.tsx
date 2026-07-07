@@ -125,7 +125,7 @@ const PersonalCourses = () => {
       // Subtract 1 credit from user profile
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({ credits: userCredits - 1 })
+        .update({ credits: userCredits - 100 })
         .eq("id", user.id);
       if (updateError) {
         alert("Failed to subtract credit. Please try again.");

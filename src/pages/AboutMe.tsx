@@ -10,8 +10,8 @@ import { Mail, Linkedin, Globe } from "lucide-react";
 
 const DEVELOPER = {
   name: "Sahil Sidhu",
-  avatar: "https://avatars.githubusercontent.com/u/10534357?v=4", // Replace with your avatar URL
-  linkedin: "https://www.linkedin.com/in/sahilsidhu7/", // Replace with your LinkedIn
+  avatar: "https://avatars.githubusercontent.com/u/172531264?v=4", // Replace with your avatar URL
+  linkedin: "https://www.linkedin.com/in/sahilpreet-singh-sidhu-568866324/", // Replace with your LinkedIn
   portfolio: "https://sahilsidhu.dev/", // Replace with your portfolio
   email: "mailto:sahilsidhu3127@gmail.com", // Replace with your email
 };
@@ -28,16 +28,16 @@ const AboutMe = () => (
           />
           <CardTitle className="text-2xl mb-1">{DEVELOPER.name}</CardTitle>
           <CardDescription className="mb-2 text-base">
-            Full Stack Developer & Creator of Learn Flow Coder
+            Learner & Creator of Learn Flow Coder
           </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
         <p className="text-lg mb-6">
-          Hi! I'm {DEVELOPER.name}, passionate about building tools that make
-          learning to code fun and accessible. I love working with modern web
-          technologies and sharing knowledge with the community. Thank you for
-          being a part of this journey!
+          Hi! I'm {DEVELOPER.name}, passionate about building solutions that I
+          face in my daily life. I love working with modern web technologies and
+          sharing knowledge with the community. Thank you for being a part of
+          this journey!
         </p>
         <div className="flex justify-center gap-6 mb-6">
           <a
@@ -49,7 +49,7 @@ const AboutMe = () => (
               <Linkedin className="h-5 w-5" /> LinkedIn
             </Button>
           </a>
-          <a
+          {/* <a
             href={DEVELOPER.portfolio}
             target="_blank"
             rel="noopener noreferrer"
@@ -57,7 +57,7 @@ const AboutMe = () => (
             <Button variant="outline" className="flex items-center gap-2">
               <Globe className="h-5 w-5" /> Portfolio
             </Button>
-          </a>
+          </a> */}
         </div>
         <div className="mb-4 text-base text-center">
           <Mail className="inline-block h-5 w-5 mr-2 align-text-bottom text-primary" />

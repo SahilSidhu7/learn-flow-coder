@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Code, BookOpen, Lightbulb, Play } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const Index = () => {
   // Auth state
@@ -22,14 +23,27 @@ const Index = () => {
 
   // Check for logged in user on mount
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null);
+    supabase.auth.getSession().then(async ({ data }) => {
+      const currentUser = data.session?.user || null;
+      setUser(currentUser);
+      if (currentUser) {
+        const userId = currentUser.id;
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", userId)
+          .single();
+        if (profileError || !profile) {
+          await supabase.from("profiles").insert({ id: userId, credits: 200 });
+        }
+      }
     });
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
       }
     );
+
     return () => {
       listener.subscription.unsubscribe();
     };
@@ -47,11 +61,9 @@ const Index = () => {
       setAuthLoading(false);
       return;
     }
-    // Insert into profiles table with user id
-    const userId = data?.user?.id;
-    if (userId) {
-      await supabase.from("profiles").insert({ id: userId });
-    }
+    toast.success(
+      "Authentication email sent! Please verify your email to login."
+    );
     setAuthLoading(false);
   }
   async function handleLogin() {
